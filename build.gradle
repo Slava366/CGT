@@ -1,3 +1,45 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile group: 'com.h2database', name: 'h2', version: '1.4.197'
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+        compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+        testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.0-M1'
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: 'com.github.rholder', name: 'gradle-one-jar', version: '1.0.4'
+    }
+}
+
 project(':common') {}
-project(':firm-server') {}
+
+project(':firm-server') {
+    apply plugin: 'gradle-one-jar'
+
+    dependencies {
+        compile project(':common')
+    }
+
+    task MyOneJar(type: OneJar) {
+        mainClass = 'Main'
+    }
+}
+
 project('pc-test') {}
