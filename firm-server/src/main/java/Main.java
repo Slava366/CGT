@@ -13,6 +13,25 @@ public class Main {
     public static void main(String[] args) {
         // Создаем сканер для прослушивания входного потока
         Scanner scanner = new Scanner(System.in);
+        // Запрашиваем размер начального капитала фирмы
+        long money = 0;
+        System.out.println("Неоходимо указать начальный капитал фирмы!");
+        while (true) {
+            System.out.print("Введите начальный капитал фирмы >>> ");
+            String stringMoney = "";
+            if(scanner.hasNextLine()) {
+                stringMoney = scanner.nextLine();
+                stringMoney = stringMoney.trim();
+                if(stringMoney.matches("^[1-9]+((\\.|,)[0-9]+)?$")) {
+                    // Если значение введено правильно
+                    money = Math.round(Double.parseDouble(stringMoney.replaceAll(",", ".")) * 100);
+                    break;
+                }
+            }
+            if(!stringMoney.isEmpty()) System.out.println("Неверный формат данных! Пример - 12548,65 или 58964");
+        }
+        // Создаем фирму
+        Firm firm = new Firm(money);
         // Запускаем сервер фирмы
         LOG.info("Запуск сервера фирмы...");
         HttpServer server = null;
@@ -42,7 +61,10 @@ public class Main {
                 System.out.println();
                 continue;
             }
-            if(command.equalsIgnoreCase("money")) continue;
+            if(command.equalsIgnoreCase("money")) {
+                System.out.printf("Текущее состояние счета - %.2f руб.\n", firm.getDoubleMoney());
+                continue;
+            }
             if(command.equalsIgnoreCase("stat")) continue;
             if(command.equalsIgnoreCase("material")) continue;
             if(command.equalsIgnoreCase("exit")) break;

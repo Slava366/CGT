@@ -3,7 +3,7 @@
  */
 public class Firm {
 
-    private Bill bill;      // Счет
+    private Bill bill = new Bill();      // Счет
 
 
     /**
@@ -27,5 +27,13 @@ public class Firm {
      */
     public long getMoney() {
         return bill.getMoney();
+    }
+
+
+    /**
+     * @return - текущее состояние счета
+     */
+    public double getDoubleMoney() {
+        return bill.getDoubleMoney();
     }
 }

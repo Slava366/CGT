@@ -16,6 +16,13 @@ public class Bill {
     }
 
     /**
+     * @return - текущее количество денег
+     */
+    public double getDoubleMoney() {
+        return money.doubleValue() / 100;
+    }
+
+    /**
      * Устанавливает новое значение денег
      * @param money - новое количество
      * @return - прежнее количество или -1
