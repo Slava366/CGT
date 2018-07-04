@@ -1,0 +1,37 @@
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * Счет
+ */
+public class Bill {
+
+    private AtomicLong money = new AtomicLong(0);   // Количество денег на счету
+
+
+    /**
+     * @return - текущее количество денег
+     */
+    public long getMoney() {
+        return money.get();
+    }
+
+    /**
+     * Устанавливает новое значение денег
+     * @param money - новое количество
+     * @return - прежнее количество или -1
+     */
+    public long setMoney(long money) {
+        if(money < 0) return -1;
+        return this.money.getAndSet(money);
+    }
+
+    /**
+     * Добавляет деньги на счет
+     * @param money - количество денег
+     * @return - прежнее количество или -1
+     */
+    public long addMoney(long money) {
+        if(money < 0) return -1;
+        return this.money.getAndAdd(money);
+    }
+}
