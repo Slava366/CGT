@@ -37,7 +37,7 @@ project(':firm-server') {
         compile project(':common')
     }
 
-    task MyOneJar(type: OneJar) {
+    task myOneJar(type: OneJar) {
         mainClass = 'Main'
     }
 }
