@@ -56,7 +56,9 @@ public class Main {
                 System.out.println("Список доступных команд сервера:");
                 System.out.printf("%-10s - отчет о состоянии счета\n", "money");
                 System.out.printf("%-10s - статистика обработки заказов\n", "stat");
-                System.out.printf("%-10s - количество материалов на складе\n", "material");
+                System.out.printf("%-10s - количество материалов на складе\n", "materials");
+                System.out.printf("%-10s - добавить материал\n", "madd");
+                System.out.printf("%-10s - добавить продукт\n", "padd");
                 System.out.printf("%-10s - завершение работы сервера\n", "exit");
                 System.out.println();
                 continue;
@@ -66,7 +68,9 @@ public class Main {
                 continue;
             }
             if(command.equalsIgnoreCase("stat")) continue;
-            if(command.equalsIgnoreCase("material")) continue;
+            if(command.equalsIgnoreCase("materials")) continue;
+            if(command.equalsIgnoreCase("madd")) continue;
+            if(command.equalsIgnoreCase("padd")) continue;
             if(command.equalsIgnoreCase("exit")) break;
             if(!command.isEmpty()) System.out.printf("Неизвестная команда '%s'!\n", command);
         }
