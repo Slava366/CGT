@@ -32,14 +32,20 @@ public class Main {
         while (true) {
             System.out.print("Введите команду >>> ");
             if(scanner.hasNextLine()) command = scanner.nextLine();
-            if(command.equalsIgnoreCase("exit")) break;
             if(command.equalsIgnoreCase("help")) {
                 System.out.println();
                 System.out.println("Список доступных команд сервера:");
-                System.out.printf("%-8s - завершение работы сервера\n", "exit");
+                System.out.printf("%-10s - отчет о состоянии счета\n", "money");
+                System.out.printf("%-10s - статистика обработки заказов\n", "stat");
+                System.out.printf("%-10s - количество материалов на складе\n", "material");
+                System.out.printf("%-10s - завершение работы сервера\n", "exit");
                 System.out.println();
                 continue;
             }
+            if(command.equalsIgnoreCase("money")) continue;
+            if(command.equalsIgnoreCase("stat")) continue;
+            if(command.equalsIgnoreCase("material")) continue;
+            if(command.equalsIgnoreCase("exit")) break;
             if(!command.isEmpty()) System.out.printf("Неизвестная команда '%s'!\n", command);
         }
         // Завершаем работу сервера
