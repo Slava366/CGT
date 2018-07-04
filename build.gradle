@@ -42,4 +42,14 @@ project(':firm-server') {
     }
 }
 
-project('pc-test') {}
+project('pc-test') {
+    apply plugin: 'gradle-one-jar'
+
+    dependencies {
+        compile project(':common')
+    }
+
+    task myOneJar(type: OneJar) {
+        mainClass = 'Main'
+    }
+}

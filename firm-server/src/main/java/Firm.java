@@ -57,12 +57,23 @@ public class Firm {
                 "mid integer NOT NULL, " +
                 "amount integer NOT NULL" +
                 ")";
-        // Статистика запросов
-        String sql_table_statistics_drop = "DROP TABLE IF EXISTS statistics";
-        String sql_table_statistics = "CREATE TABLE IF NOT EXISTS statistics " +
+        // Статистика запросов по клиенту
+        String sql_table_customer_drop = "DROP TABLE IF EXISTS customer";
+        String sql_table_customer = "CREATE TABLE IF NOT EXISTS customer " +
                 "(" +
-                "message varchar(254) NOT NULL, " +
-                "time timestamp NOT NULL" +
+                "name varchar(254) NOT NULL, " +
+                "product varchar(254) NOT NULL, " +
+                "sale bit NOT NULL, " +
+                "price bigint NOT NULL" +
+                ")";
+        // Статистика запросов по поставщику
+        String sql_table_provider_drop = "DROP TABLE IF EXISTS customer";
+        String sql_table_provider = "CREATE TABLE IF NOT EXISTS customer " +
+                "(" +
+                "name varchar(254) NOT NULL, " +
+                "material varchar(254) NOT NULL, " +
+                "sale bit NOT NULL, " +
+                "price bigint NOT NULL" +
                 ")";
         // Выволняем запрос по созданию таблиц
         try {
@@ -70,8 +81,10 @@ public class Firm {
             statement.addBatch(sql_table_products);
             statement.addBatch(sql_table_materials);
             statement.addBatch(sql_table_relation);
-            statement.addBatch(sql_table_statistics_drop);
-            statement.addBatch(sql_table_statistics);
+            statement.addBatch(sql_table_customer_drop);
+            statement.addBatch(sql_table_customer);
+            statement.addBatch(sql_table_provider_drop);
+            statement.addBatch(sql_table_provider);
             statement.executeBatch();
         } catch (SQLException e) {
             LOG.error(e.getMessage());
