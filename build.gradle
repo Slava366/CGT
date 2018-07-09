@@ -1,3 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: 'com.h2database', name: 'h2', version: '1.4.191'
+        classpath group: 'com.github.rholder', name: 'gradle-one-jar', version: '1.0.4'
+    }
+}
+
+plugins {
+    id "org.flywaydb.flyway" version "5.1.4"
+}
+
+flyway {
+    url = 'jdbc:h2:file:./db_firm;AUTO_SERVER=TRUE'
+    user = 'test'
+    password = 'pass'
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.1'
 }
@@ -15,16 +36,6 @@ subprojects {
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
         compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
         testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.0-M1'
-    }
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath group: 'com.github.rholder', name: 'gradle-one-jar', version: '1.0.4'
     }
 }
 

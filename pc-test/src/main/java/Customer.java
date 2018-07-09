@@ -2,7 +2,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Customer extends Thread {
@@ -12,8 +11,6 @@ public class Customer extends Thread {
     private Connection connection;               // Активное соединение с БД
 
     private static AtomicInteger id = new AtomicInteger(0);
-
-    private String name;                         // Название заказчика
 
     private Bill bill = new Bill();              // Счет
 
@@ -25,24 +22,25 @@ public class Customer extends Thread {
      * @param money - начальный капитал
      * @param maxFailure - максимальное количество отказов
      */
-    public Customer(long money, int maxFailure) {
+    public Customer(long money, int maxFailure, Connection connection) {
         bill.setMoney(money);
         this.maxFailure = maxFailure;
-        name = String.format("Заказчик_%03d", id.incrementAndGet());
-    }
-
-
-    /**
-     *
-     * @return - наименование заказчика
-     */
-    public String getNameId() {
-        return name;
+        this.connection = connection;
     }
 
 
     @Override
     public void run() {
         super.run();
+        Thread.currentThread().setName(String.format("Заказчик_%03d", id.incrementAndGet()));
+        LOG.info(String.format("Заказчик '%s' начал работу!", this.getName()));
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        LOG.info(String.format("Заказчик '%s' завершил свою работу!", this.getName()));
     }
 }

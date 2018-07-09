@@ -1,10 +1,9 @@
-import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.Scanner;
+
 
 public class Main {
 
@@ -22,7 +21,7 @@ public class Main {
             if(scanner.hasNextLine()) {
                 stringMoney = scanner.nextLine();
                 stringMoney = stringMoney.trim();
-                if(stringMoney.matches("^[1-9]+((\\.|,)[0-9]+)?$")) {
+                if(stringMoney.matches("^[1-9][0-9]*((\\.|,)[0-9]+)?$")) {
                     // Если значение введено правильно
                     money = Math.round(Double.parseDouble(stringMoney.replaceAll(",", ".")) * 100);
                     break;
@@ -30,21 +29,10 @@ public class Main {
             }
             if(!stringMoney.isEmpty()) System.out.println("Неверный формат данных! Пример - 12548,65 или 58964");
         }
-        // Создаем фирму
-        Firm firm = new Firm(money);
         // Запускаем сервер фирмы
         LOG.info("Запуск сервера фирмы...");
-        HttpServer server = null;
-        try {
-            server = HttpServer.create(new InetSocketAddress(8080), 0);
-            server.createContext("/", new ServerHandler());     // Обработчик запросов
-            server.setExecutor(null);
-            server.start();
-            LOG.info("Сервер фирмы запущен!");
-        } catch (IOException e) {
-            // Ошибка запуска
-            LOG.error(e.getMessage());
-        }
+        FirmServer firmServer = new FirmServer(money);
+        firmServer.start();
         // Слушаем команды сервера
         System.out.println("Для получения списка доступных команд введите help. ");
         String command = "";
@@ -64,7 +52,7 @@ public class Main {
                 continue;
             }
             if(command.equalsIgnoreCase("money")) {
-                System.out.printf("Текущее состояние счета - %.2f руб.\n", firm.getDoubleMoney());
+                System.out.printf("Текущее состояние счета - %.2f руб.\n", firmServer.getDoubleMoney());
                 continue;
             }
             if(command.equalsIgnoreCase("stat")) continue;
@@ -76,7 +64,13 @@ public class Main {
         }
         // Завершаем работу сервера
         LOG.info("Завершение работы сервера...");
-        if(server != null) server.stop(0);
+        try {
+            firmServer.setExit(true);
+            Thread.sleep(3000);
+            if(!firmServer.getServer().isClosed()) firmServer.getServer().close();
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage());
+        } catch (IOException e) {/**/}
         LOG.info("Сервер фирмы завершил работу!");
     }
 }
