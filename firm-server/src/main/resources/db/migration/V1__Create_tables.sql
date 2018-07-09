@@ -27,7 +27,7 @@ create table customer
 (
     NAME varchar(30) NOT NULL,
     PID integer NOT NULL,
-    SATE bit NOT NULL,
+    SALE bit NOT NULL,
     PRICE bigint NOT NULL
 );
 
@@ -36,6 +36,6 @@ create table provider
 (
     NAME varchar(30) NOT NULL,
     PID integer NOT NULL,
-    SATE bit NOT NULL,
+    SALE bit NOT NULL,
     PRICE bigint NOT NULL
 );

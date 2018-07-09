@@ -17,6 +17,7 @@ flyway {
     url = 'jdbc:h2:file:./db_firm;AUTO_SERVER=TRUE'
     user = 'test'
     password = 'pass'
+    locations = ['filesystem:d:/Java/ConnectiveGames/CGT/firm-server/src/main/resources/db/migration/']
 }
 
 task wrapper(type: Wrapper) {

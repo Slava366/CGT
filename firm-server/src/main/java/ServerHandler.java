@@ -13,14 +13,18 @@ public class ServerHandler implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerHandler.class);                   // Лог
 
-    private Socket client;
+    private Firm firm;          // Фирма
+
+    private Socket client;      // Диалог с клиентом
 
 
     /**
      * Конструктор
+     * @param firm - фирма
      * @param client - диалог с клиентом
      */
-    public ServerHandler(Socket client) {
+    public ServerHandler(Firm firm, Socket client) {
+        this.firm = firm;
         this.client = client;
     }
 
@@ -38,10 +42,11 @@ public class ServerHandler implements Runnable {
             // Определяем чей это запрос
             if(requestObject instanceof ProductRequest) {
                 // Запрос заказчика
+                // TODO
             }
             if(requestObject instanceof MaterialRequest) {
                 // Запрос поставщика
-
+                // TODO
             }
         } catch (IOException | ClassNotFoundException e) {
             LOG.error(e.getMessage());

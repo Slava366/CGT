@@ -1,7 +1,10 @@
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import response.StockMaterial;
 
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Фирма
@@ -21,6 +24,7 @@ public class Firm {
     public Firm() {
         this(0);
     }
+
 
     /**
      * Конструктор с указанием начального капитала
@@ -53,5 +57,26 @@ public class Firm {
      */
     public double getDoubleMoney() {
         return bill.getDoubleMoney();
+    }
+
+
+    /**
+     * @return - остатки материалов на складе
+     * @throws SQLException -
+     */
+    public List<StockMaterial> getMaterials() throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        String sql = "select * from materials";
+        ResultSet resultSet = statement.executeQuery(sql);
+        List<StockMaterial> materials = new LinkedList<>();
+        while (resultSet.next()) {
+            StockMaterial material = new StockMaterial();
+            material.setId(resultSet.getInt("id"));
+            material.setName(resultSet.getString("name"));
+            material.setAmount(resultSet.getInt("amount"));
+            material.setPrice(resultSet.getLong("price"));
+            materials.add(material);
+        }
+        return materials;
     }
 }

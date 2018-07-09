@@ -26,11 +26,11 @@ public class FirmServer extends Thread {
 
     /**
      * Конструктор
-     * @param money - начальный капитал
+     * @param firm - фирма
      */
-    public FirmServer(long money) {
+    public FirmServer(Firm firm) {
         // Создаем фирму с начальным капиталом
-        firm = new Firm(money);
+        this.firm = firm;
     }
 
 
@@ -87,7 +87,7 @@ public class FirmServer extends Thread {
                 // Ожидаем подключение
                 Socket client = server.accept();
                 // Отправляем в отдельную нить
-                executorService.execute(new ServerHandler(client));
+                executorService.execute(new ServerHandler(firm, client));
             }
         } catch (IOException e) {
             if(!e.getMessage().equals("socket closed")) LOG.error(e.getMessage());
