@@ -1,5 +1,7 @@
+import customer.CustomerStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import provider.ProviderStatistics;
 import response.StockMaterial;
 
 import java.sql.*;
@@ -78,5 +80,53 @@ public class Firm {
             materials.add(material);
         }
         return materials;
+    }
+
+
+    /**
+     * @return - Статистика заказов по заказчику
+     * @throws SQLException -
+     */
+    public List<CustomerStatistics> getCustomerStatistics() throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        String sql = "select customer.name as customerName, products.name as productName, customer.sale, customer.price " +
+                "from customer " +
+                "inner join products " +
+                "on customer.pid = products.id";
+        ResultSet resultSet = statement.executeQuery(sql);
+        List<CustomerStatistics> statistics = new LinkedList<>();
+        while (resultSet.next()) {
+            CustomerStatistics customerStatistics = new CustomerStatistics();
+            customerStatistics.setCustomerName(resultSet.getString("customerName"));
+            customerStatistics.setProductName(resultSet.getString("productName"));
+            customerStatistics.setSale(resultSet.getBoolean("sale"));
+            customerStatistics.setPrice(resultSet.getLong("price"));
+            statistics.add(customerStatistics);
+        }
+        return statistics;
+    }
+
+
+    /**
+     * @return - Статистика заказов по поставщику
+     * @throws SQLException -
+     */
+    public List<ProviderStatistics> getProviderStatistics() throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        String sql = "select provider.name as providerName, materials.name as materialName, provider.sale, provider.price " +
+                "from provider " +
+                "inner join materials " +
+                "on provider.mid = materials.id";
+        ResultSet resultSet = statement.executeQuery(sql);
+        List<ProviderStatistics> statistics = new LinkedList<>();
+        while (resultSet.next()) {
+            ProviderStatistics providerStatistics = new ProviderStatistics();
+            providerStatistics.setProviderName(resultSet.getString("providerName"));
+            providerStatistics.setMaterialName(resultSet.getString("materialName"));
+            providerStatistics.setSale(resultSet.getBoolean("sale"));
+            providerStatistics.setPrice(resultSet.getLong("price"));
+            statistics.add(providerStatistics);
+        }
+        return statistics;
     }
 }

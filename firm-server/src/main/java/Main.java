@@ -1,10 +1,11 @@
+import customer.CustomerStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import provider.ProviderStatistics;
 import response.StockMaterial;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -63,7 +64,7 @@ public class Main {
                 System.out.printf("Текущее состояние счета - %.2f руб.\n", firmServer.getDoubleMoney());
                 continue;
             }
-            if(command.equalsIgnoreCase("stat")) continue;
+            if(command.equalsIgnoreCase("stat")) { printStatistics(); continue; }
             if(command.equalsIgnoreCase("materials")) { printStockMaterials(); continue; }
             if(command.equalsIgnoreCase("madd")) continue;
             if(command.equalsIgnoreCase("padd")) continue;
@@ -84,17 +85,53 @@ public class Main {
 
 
     /**
+     * Выводит статистику заказов
+     */
+    private static void printStatistics() {
+        // Статистика по заказчикам
+        List<CustomerStatistics> customerStatistics;
+        try {
+            customerStatistics = firm.getCustomerStatistics();
+            System.out.println();
+            if(0 != customerStatistics.size()) {
+                System.out.println("Статистика по заказчикам:");
+                System.out.printf("%-15s %-30s %-15s %-10s\n", "Наименование", "Продукт", "Сделка", "Цена, руб.");
+            } else System.out.println("Статистика по заказчикам отсутствует!");
+            for(CustomerStatistics cs : customerStatistics)
+                System.out.printf("%-15s %-30s %-15s %-10.2f\n", cs.getCustomerName(), cs.getProductName(), (cs.isSale())? "Проведена" : "Отказано", (double) cs.getPrice() / 100);
+        } catch (SQLException e) {
+            LOG.error(e.getMessage());
+        }
+        // Статистика по заказчикам
+        List<ProviderStatistics> providerStatistics;
+        try {
+            providerStatistics = firm.getProviderStatistics();
+            System.out.println();
+            if(0 != providerStatistics.size()) {
+                System.out.println("Статистика по поставщикам:");
+                System.out.printf("%-15s %-30s %-15s %-10s\n", "Наименование", "Материал", "Сделка", "Цена, руб.");
+            } else System.out.println("Статистика по поставщикам отсутствует!");
+            for(ProviderStatistics ps : providerStatistics)
+                System.out.printf("%-15s %-30s %-15s %-10.2f\n", ps.getProviderName(), ps.getMaterialName(), (ps.isSale())? "Проведена" : "Отказано", (double) ps.getPrice() / 100);
+            System.out.println();
+        } catch (SQLException e) {
+            LOG.error(e.getMessage());
+        }
+    }
+
+
+    /**
      * Выводит остаток материалов на складе
      */
     private static void printStockMaterials() {
-        List<StockMaterial> stockMaterials = new LinkedList<>();
+        List<StockMaterial> stockMaterials;
         try {
             stockMaterials = firm.getMaterials();
+            System.out.println();
             if(0 != stockMaterials.size()) {
-                System.out.println();
                 System.out.println("Количество материалов на складе:");
                 System.out.printf("%-5s %-30s %-15s %-10s\n", "Id", "Наименование", "Количество, шт.", "Цена, руб.");
-            }
+            } else  System.out.println("На складе нет материалов!");
             for(StockMaterial material : stockMaterials)
                 System.out.printf("%-5d %-30s %-15d %-10.2f\n", material.getId(), material.getName(), material.getAmount(), (double) material.getPrice() / 100);
             System.out.println();
