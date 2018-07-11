@@ -1,7 +1,9 @@
 package provider;
 
 
-public class Material {
+import java.io.Serializable;
+
+public class Material implements Serializable {
 
     private int id;
 

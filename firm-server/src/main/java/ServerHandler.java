@@ -1,10 +1,13 @@
 import customer.ProductRequest;
+import firm.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import provider.MaterialRequest;
+import provider.ProviderStatistics;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  * Обработчик запросов
@@ -45,10 +48,26 @@ public class ServerHandler implements Runnable {
                 // TODO
             }
             if(requestObject instanceof MaterialRequest) {
-                // Запрос поставщика
-                // TODO
+                // Отправляем ответ на запрос поставщика
+                MaterialRequest materialRequest = (MaterialRequest) requestObject;
+                Response response = new Response(false);
+                long materialPrice = materialRequest.getPrice() * materialRequest.getAmount();
+                if(firm.getMoney() >= materialPrice) {
+                    firm.debitMoney(materialPrice);     // Снимаем деньги со счета
+                    response.setSuccess(true);
+                }
+                // Сохраняем статистику
+                ProviderStatistics providerStatistics = new ProviderStatistics();
+                providerStatistics.setProviderName(materialRequest.getProviderName());
+                providerStatistics.setMaterialName(materialRequest.getName());
+                providerStatistics.setSale(response.isSuccess());
+                providerStatistics.setPrice(materialPrice);
+                firm.addProviderStatistics(providerStatistics);
+                // Отправляем результат
+                oos.writeObject(response);
+                oos.flush();
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException | SQLException e) {
             LOG.error(e.getMessage());
         }
     }

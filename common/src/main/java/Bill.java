@@ -41,4 +41,14 @@ public class Bill {
         if(money < 0) return -1;
         return this.money.getAndAdd(money);
     }
+
+    /**
+     * Снимает деньги со счета
+     * @param money - снимаемое количество
+     * @return прежнее количество или -1
+     */
+    public long debitMoney(long money) {
+        if(money < 0 | this.money.get() < money) return -1;
+        return this.money.getAndSet(this.money.get() - money);
+    }
 }

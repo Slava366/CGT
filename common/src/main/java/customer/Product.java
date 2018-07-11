@@ -1,6 +1,8 @@
 package customer;
 
-public class Product {
+import java.io.Serializable;
+
+public class Product implements Serializable {
 
     private int id;
 
@@ -11,6 +13,10 @@ public class Product {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

@@ -16,11 +16,10 @@ public class Response implements Serializable {
     /**
      * Конструктор
      * @param success - статус
-     * @param message - сообщение
+     *
      */
-    public Response(boolean success, String message) {
+    public Response(boolean success) {
         this.success = success;
-        this.message = message;
     }
 
 

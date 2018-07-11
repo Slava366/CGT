@@ -47,6 +47,36 @@ public class Firm {
 
 
     /**
+     * Снимает деньги
+     * @param money - снимаемая сумма
+     * @return - прежняя сумма или -1
+     */
+    public long debitMoney(long money) {
+        return bill.debitMoney(money);
+    }
+
+
+    /**
+     * Устанавливает новое значение денег
+     * @param money - новое количество
+     * @return - прежнее количество или -1
+     */
+    public long setMoney(long money) {
+        return bill.setMoney(money);
+    }
+
+
+    /**
+     * Добавляет деньги на счет
+     * @param money - количество денег
+     * @return - прежнее количество или -1
+     */
+    public long addMoney(long money) {
+        return bill.addMoney(money);
+    }
+
+
+    /**
      * @return - текущее состояние счета
      */
     public long getMoney() {
@@ -156,9 +186,26 @@ public class Firm {
         String sql = "insert into provider values(?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, providerStatistics.getProviderName());
-        statement.setString(2, providerStatistics.getMaterialName());
+        statement.setInt(2, getMaterialId(providerStatistics.getMaterialName()));
         statement.setBoolean(3, providerStatistics.isSale());
         statement.setLong(4, providerStatistics.getPrice());
         statement.executeUpdate();
+    }
+
+
+    /**
+     * Возвращает идентификатор материала
+     * @param materialName - название материала
+     * @return - идентификатор материала
+     * @throws SQLException -
+     */
+    public int getMaterialId(String materialName) throws SQLException {
+        String sql = "select * from materials where name = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, materialName);
+        ResultSet resultSet = statement.executeQuery();
+        int id = 0;
+        if(resultSet.next()) id = resultSet.getInt("id");
+        return id;
     }
 }
