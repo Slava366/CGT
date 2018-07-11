@@ -48,7 +48,7 @@ public class Bill {
      * @return прежнее количество или -1
      */
     public long debitMoney(long money) {
-        if(money < 0 | this.money.get() < money) return -1;
+        if(money < 0) return -1;
         return this.money.getAndSet(this.money.get() - money);
     }
 }

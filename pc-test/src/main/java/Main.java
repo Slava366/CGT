@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ public class Main {
         // Создаем сканер для прослушивания входного потока
         Scanner scanner = new Scanner(System.in);
         // Запрашиваем количество одновременно работающих заказчиков
-        int customerAmount = 5;//getCustomerAmount(scanner);
+        int customerAmount = 1;//getCustomerAmount(scanner);
         // Запрашиваем количество максимально допустимых отказов заказчику
         int maxFailure = 5;//getCustomerMaxFailure(scanner);
         // Запрашиваем размер начального капитала заказчика
@@ -34,6 +35,10 @@ public class Main {
         try {
             Class.forName("org.h2.Driver");
             connection = DriverManager.getConnection("jdbc:h2:file:./db_firm;AUTO_SERVER=true", "test", "pass");
+            // Очищаем таблицы статистик
+            String sql = "delete from customer; delete from provider;";
+            Statement statement = connection.createStatement();
+            statement.execute(sql);
             LOG.info("Установлено соединение с БД!");
         } catch (ClassNotFoundException | SQLException e) {
             LOG.error(e.getMessage());
@@ -41,14 +46,14 @@ public class Main {
         }
         LOG.info("Запускаем тест...");
 
-        // Начинаем работу поставщиков
+        /*// Начинаем работу поставщиков
         List<Provider> providers = new ArrayList<>();
         for (int i = 0; i < providerAmount; i++) {
             Provider provider = new Provider(providerInterval, connection);
             providers.add(provider);
             provider.start();
-        }
-        /*// Начинаем работу заказчиков
+        }*/
+        // Начинаем работу заказчиков
         List<Customer> customers = new ArrayList<>();
         for (int i = 0; i < customerAmount; i++) {
             Customer customer = new Customer(customerMoney, maxFailure, connection);
@@ -64,7 +69,7 @@ public class Main {
             } catch (InterruptedException e) {
                 LOG.error(e.getMessage());
             }
-        }*/
+        }
         /*// Завершение работы поставщиков
         for(Provider provider : providers) {
             provider.exit();
@@ -76,12 +81,6 @@ public class Main {
         }
         LOG.info("Тест завершил свою работу!");
         System.out.println();*/
-        try {
-            providers.get(0).join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
 
         // Закрываем соединение с БД
         try {

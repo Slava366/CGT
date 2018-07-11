@@ -170,10 +170,27 @@ public class Firm {
         String sql = "insert into customer values(?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, customerStatistics.getCustomerName());
-        statement.setString(2, customerStatistics.getProductName());
+        statement.setInt(2, getProductId(customerStatistics.getProductName()));
         statement.setBoolean(3, customerStatistics.isSale());
         statement.setLong(4, customerStatistics.getPrice());
         statement.executeUpdate();
+    }
+
+
+    /**
+     * Возвращает идентификатор продукта
+     * @param productName - название продукта
+     * @return - идентификатор материала
+     * @throws SQLException -
+     */
+    private int getProductId(String productName) throws SQLException {
+        String sql = "select * from products where name = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, productName);
+        ResultSet resultSet = statement.executeQuery();
+        int id = 0;
+        if(resultSet.next()) id = resultSet.getInt("id");
+        return id;
     }
 
 
