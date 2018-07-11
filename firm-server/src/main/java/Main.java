@@ -61,7 +61,7 @@ public class Main {
                 continue;
             }
             if(command.equalsIgnoreCase("money")) {
-                System.out.printf("Текущее состояние счета - %.2f руб.\n", firmServer.getDoubleMoney());
+                System.out.printf("Текущее состояние счета: %.2f руб.\n", firmServer.getDoubleMoney());
                 continue;
             }
             if(command.equalsIgnoreCase("stat")) { printStatistics(); continue; }
@@ -90,29 +90,37 @@ public class Main {
     private static void printStatistics() {
         // Статистика по заказчикам
         List<CustomerStatistics> customerStatistics;
+        long customerSum = 0;
         try {
             customerStatistics = firm.getCustomerStatistics();
             System.out.println();
             if(0 != customerStatistics.size()) {
                 System.out.println("Статистика по заказчикам:");
-                System.out.printf("%-15s %-30s %-15s %-10s\n", "Наименование", "Продукт", "Сделка", "Цена, руб.");
+                System.out.printf("%-15s %-30s %-15s %-15s %-10s\n", "Наименование", "Продукт", "Сделка", "Количество, шт.", "Сумма, руб.");
             } else System.out.println("Статистика по заказчикам отсутствует!");
-            for(CustomerStatistics cs : customerStatistics)
-                System.out.printf("%-15s %-30s %-15s %-10.2f\n", cs.getCustomerName(), cs.getProductName(), (cs.isSale())? "Проведена" : "Отказано", (double) cs.getPrice() / 100);
+            for(CustomerStatistics cs : customerStatistics) {
+                if(cs.isSale()) customerSum += cs.getPrice();
+                System.out.printf("%-15s %-30s %-15s %-15d %-10.2f\n", cs.getCustomerName(), cs.getProductName(), (cs.isSale())? "Проведена" : "Отказано", cs.getAmount(), (double) cs.getPrice() / 100);
+            }
+            System.out.printf("Итого продано продуктов на сумму: %.2f руб.\n", (double) customerSum / 100);
         } catch (SQLException e) {
             LOG.error(e.getMessage());
         }
         // Статистика по заказчикам
         List<ProviderStatistics> providerStatistics;
+        long providerSum = 0;
         try {
             providerStatistics = firm.getProviderStatistics();
             System.out.println();
             if(0 != providerStatistics.size()) {
                 System.out.println("Статистика по поставщикам:");
-                System.out.printf("%-15s %-30s %-15s %-10s\n", "Наименование", "Материал", "Сделка", "Цена, руб.");
+                System.out.printf("%-15s %-30s %-15s %-15s %-10s\n", "Наименование", "Материал", "Сделка", "Количество, шт.", "Сумма, руб.");
             } else System.out.println("Статистика по поставщикам отсутствует!");
-            for(ProviderStatistics ps : providerStatistics)
-                System.out.printf("%-15s %-30s %-15s %-10.2f\n", ps.getProviderName(), ps.getMaterialName(), (ps.isSale())? "Проведена" : "Отказано", (double) ps.getPrice() / 100);
+            for(ProviderStatistics ps : providerStatistics) {
+                if(ps.isSale()) providerSum += ps.getPrice();
+                System.out.printf("%-15s %-30s %-15s %-15d %-10.2f\n", ps.getProviderName(), ps.getMaterialName(), (ps.isSale())? "Проведена" : "Отказано", ps.getAmount(), (double) ps.getPrice() / 100);
+            }
+            System.out.printf("Итого куплено материалов на сумму: %.2f руб.\n", (double) providerSum / 100);
             System.out.println();
         } catch (SQLException e) {
             LOG.error(e.getMessage());

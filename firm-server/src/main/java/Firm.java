@@ -119,7 +119,7 @@ public class Firm {
      */
     public List<CustomerStatistics> getCustomerStatistics() throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        String sql = "select customer.name as customerName, products.name as productName, customer.sale, customer.price " +
+        String sql = "select customer.name as customerName, products.name as productName, customer.amount, customer.sale, customer.price " +
                 "from customer " +
                 "inner join products " +
                 "on customer.pid = products.id";
@@ -129,6 +129,7 @@ public class Firm {
             CustomerStatistics customerStatistics = new CustomerStatistics();
             customerStatistics.setCustomerName(resultSet.getString("customerName"));
             customerStatistics.setProductName(resultSet.getString("productName"));
+            customerStatistics.setAmount(resultSet.getInt("amount"));
             customerStatistics.setSale(resultSet.getBoolean("sale"));
             customerStatistics.setPrice(resultSet.getLong("price"));
             statistics.add(customerStatistics);
@@ -143,7 +144,7 @@ public class Firm {
      */
     public List<ProviderStatistics> getProviderStatistics() throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        String sql = "select provider.name as providerName, materials.name as materialName, provider.sale, provider.price " +
+        String sql = "select provider.name as providerName, materials.name as materialName, provider.amount, provider.sale, provider.price " +
                 "from provider " +
                 "inner join materials " +
                 "on provider.mid = materials.id";
@@ -153,6 +154,7 @@ public class Firm {
             ProviderStatistics providerStatistics = new ProviderStatistics();
             providerStatistics.setProviderName(resultSet.getString("providerName"));
             providerStatistics.setMaterialName(resultSet.getString("materialName"));
+            providerStatistics.setAmount(resultSet.getInt("amount"));
             providerStatistics.setSale(resultSet.getBoolean("sale"));
             providerStatistics.setPrice(resultSet.getLong("price"));
             statistics.add(providerStatistics);
@@ -167,12 +169,13 @@ public class Firm {
      * @throws SQLException -
      */
     public void addCustomerStatistics(CustomerStatistics customerStatistics) throws SQLException {
-        String sql = "insert into customer values(?, ?, ?, ?)";
+        String sql = "insert into customer values(?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, customerStatistics.getCustomerName());
         statement.setInt(2, getProductId(customerStatistics.getProductName()));
-        statement.setBoolean(3, customerStatistics.isSale());
-        statement.setLong(4, customerStatistics.getPrice());
+        statement.setInt(3, customerStatistics.getAmount());
+        statement.setBoolean(4, customerStatistics.isSale());
+        statement.setLong(5, customerStatistics.getPrice());
         statement.executeUpdate();
     }
 
@@ -200,12 +203,13 @@ public class Firm {
      * @throws SQLException -
      */
     public void addProviderStatistics(ProviderStatistics providerStatistics) throws SQLException {
-        String sql = "insert into provider values(?, ?, ?, ?)";
+        String sql = "insert into provider values(?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, providerStatistics.getProviderName());
         statement.setInt(2, getMaterialId(providerStatistics.getMaterialName()));
-        statement.setBoolean(3, providerStatistics.isSale());
-        statement.setLong(4, providerStatistics.getPrice());
+        statement.setInt(3, providerStatistics.getAmount());
+        statement.setBoolean(4, providerStatistics.isSale());
+        statement.setLong(5, providerStatistics.getPrice());
         statement.executeUpdate();
     }
 
@@ -224,5 +228,71 @@ public class Firm {
         int id = 0;
         if(resultSet.next()) id = resultSet.getInt("id");
         return id;
+    }
+
+
+    /**
+     * Может ли фирма произвести продукт с идентификатором id
+     * @param id - идентификатор продукта
+     * @param amount - количество продукта
+     * @return - true может
+     */
+    public boolean canCreateProduct(int id, int amount) throws SQLException {
+        String sql = "select * " +
+                "from products " +
+                "inner join relation " +
+                "on products.id = relation.pid " +
+                "inner join materials " +
+                "on relation.mid = materials.id " +
+                "where products.id = ? and materials.amount >= relation.amount * ? " +
+                "group by products.name, materials.name";
+        PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        statement.setInt(1, id);
+        statement.setInt(2, amount);
+        ResultSet resultSet = statement.executeQuery();
+        return resultSet.next();
+    }
+
+
+    /**
+     * Добавляет материал на склад
+     * @param id - идентификатор материала
+     * @param amount - количество материала
+     */
+    public void materialToStock(int id, int amount) throws SQLException {
+        String sql = "update materials set materials.amount = materials.amount + ? where materials.id = ?";
+        PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        statement.setInt(1, amount);
+        statement.setInt(2, id);
+        statement.executeUpdate();
+    }
+
+
+    /**
+     * Удаляет материал со склада
+     * @param id - идентификатор материала
+     * @param amount - количество материала
+     */
+    public void productFromStock(int id, int amount) throws SQLException {
+        String sql = "select materials.id as id, materials.amount as materialsAmount, relation.amount as relationAmount " +
+                "from products " +
+                "inner join relation " +
+                "on products.id = relation.pid " +
+                "inner join materials " +
+                "on relation.mid = materials.id " +
+                "where products.id = ? and materials.amount >= relation.amount * ? " +
+                "group by products.name, materials.name";
+        PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        statement.setInt(1, id);
+        statement.setInt(2, amount);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            int newAmount = resultSet.getInt("materialsAmount") - resultSet.getInt("relationAmount") * amount;
+            sql = "update materials set materials.amount = ? where materials.id = ?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, newAmount);
+            statement.setInt(2, resultSet.getInt("id"));
+            statement.executeUpdate();
+        }
     }
 }

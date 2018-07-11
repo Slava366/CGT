@@ -2,7 +2,6 @@ import customer.ProductRequest;
 import firm.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import provider.MaterialRequest;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class Customer extends Thread {
 
@@ -35,7 +35,7 @@ public class Customer extends Thread {
      * @param maxFailure - максимальное количество отказов
      */
     public Customer(long money, int maxFailure, Connection connection) {
-        bill.setMoney(money);
+        bill.setMoney(money * 100);
         this.maxFailure = maxFailure;
         this.connection = connection;
     }
@@ -71,7 +71,7 @@ public class Customer extends Thread {
                 Object responseObject = ois.readObject();
                 if(responseObject instanceof Response) {
                     if(((Response) responseObject).isSuccess()) {
-                        bill.debitMoney(productRequest.getPrice());     // Списываем деньги
+                        bill.debitMoney(productRequest.getPrice() * productRequest.getAmount());     // Списываем деньги
                         LOG.info(String.format("Фирма продала продукт '%s' стоимостью %.2f руб. в количестве %d шт.",
                                 productRequest.getName(), (double) productRequest.getPrice() / 100, productRequest.getAmount()));
                     } else {

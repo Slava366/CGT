@@ -21,15 +21,15 @@ public class Main {
         // Создаем сканер для прослушивания входного потока
         Scanner scanner = new Scanner(System.in);
         // Запрашиваем количество одновременно работающих заказчиков
-        int customerAmount = 1;//getCustomerAmount(scanner);
+        int customerAmount = getCustomerAmount(scanner);
         // Запрашиваем количество максимально допустимых отказов заказчику
-        int maxFailure = 5;//getCustomerMaxFailure(scanner);
+        int maxFailure = getCustomerMaxFailure(scanner);
         // Запрашиваем размер начального капитала заказчика
-        long customerMoney = 5000;//getCustomerMoney(scanner);
+        long customerMoney = getCustomerMoney(scanner);
         // Запрашиваем количество одновременно работающих поставщиков
-        int providerAmount = 2;//getProviderAmount(scanner);
+        int providerAmount = getProviderAmount(scanner);
         // Запрашиваем интервал между обращениями поставщика к серверу фирмы
-        int providerInterval = 2000;//getProviderInterval(scanner);
+        int providerInterval = getProviderInterval(scanner);
 
         // Устанавливаем соединение с БД
         try {
@@ -46,13 +46,13 @@ public class Main {
         }
         LOG.info("Запускаем тест...");
 
-        /*// Начинаем работу поставщиков
+        // Начинаем работу поставщиков
         List<Provider> providers = new ArrayList<>();
         for (int i = 0; i < providerAmount; i++) {
             Provider provider = new Provider(providerInterval, connection);
             providers.add(provider);
             provider.start();
-        }*/
+        }
         // Начинаем работу заказчиков
         List<Customer> customers = new ArrayList<>();
         for (int i = 0; i < customerAmount; i++) {
@@ -70,7 +70,7 @@ public class Main {
                 LOG.error(e.getMessage());
             }
         }
-        /*// Завершение работы поставщиков
+        // Завершение работы поставщиков
         for(Provider provider : providers) {
             provider.exit();
             try {
@@ -80,7 +80,7 @@ public class Main {
             }
         }
         LOG.info("Тест завершил свою работу!");
-        System.out.println();*/
+        System.out.println();
 
         // Закрываем соединение с БД
         try {

@@ -6,6 +6,8 @@ public class CustomerStatistics {
 
     private String productName;
 
+    private int amount;
+
     private boolean sale;
 
     private long price;
@@ -41,5 +43,13 @@ public class CustomerStatistics {
 
     public void setPrice(long price) {
         this.price = price;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 }
