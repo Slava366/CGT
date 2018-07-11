@@ -129,4 +129,36 @@ public class Firm {
         }
         return statistics;
     }
+
+
+    /**
+     * Сохраняет сделку с заказчиком
+     * @param customerStatistics - сделка с заказчиком
+     * @throws SQLException -
+     */
+    public void addCustomerStatistics(CustomerStatistics customerStatistics) throws SQLException {
+        String sql = "insert into customer values(?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, customerStatistics.getCustomerName());
+        statement.setString(2, customerStatistics.getProductName());
+        statement.setBoolean(3, customerStatistics.isSale());
+        statement.setLong(4, customerStatistics.getPrice());
+        statement.executeUpdate();
+    }
+
+
+    /**
+     * Сохраняет сделку с поставщиком
+     * @param providerStatistics - сделка с поставщиком
+     * @throws SQLException -
+     */
+    public void addProviderStatistics(ProviderStatistics providerStatistics) throws SQLException {
+        String sql = "insert into provider values(?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, providerStatistics.getProviderName());
+        statement.setString(2, providerStatistics.getMaterialName());
+        statement.setBoolean(3, providerStatistics.isSale());
+        statement.setLong(4, providerStatistics.getPrice());
+        statement.executeUpdate();
+    }
 }
