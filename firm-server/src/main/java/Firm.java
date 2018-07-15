@@ -295,4 +295,75 @@ public class Firm {
             statement.executeUpdate();
         }
     }
+
+
+    /**
+     * Добавляет материал
+     * @param name - наименование
+     * @param amount - количество
+     * @param price - цена
+     */
+    public void addStockMaterial(String name, int amount, long price) throws SQLException {
+        String sql = "select * from materials where name = ?";
+        PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+        statement.setString(1, name);
+        ResultSet resultSet = statement.executeQuery();
+        if(resultSet.next()) {
+            // Обновляем
+            resultSet.updateInt("amount", amount + resultSet.getInt("amount"));
+            resultSet.updateLong("price", price);
+            resultSet.updateRow();
+        } else {
+            // Добавляем запись
+            sql = "insert into materials(name,amount,price) values(?, ?, ?)";
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, name);
+            statement.setInt(2, amount);
+            statement.setLong(3, price);
+            statement.executeUpdate();
+        }
+    }
+
+
+    /**
+     * Добавляет продукт
+     * @param productName - наименование продукта
+     * @param materialName - наименование материала
+     * @param materialAmount - количество материала
+     * @param materialPrice - цена материала
+     */
+    public void addStockProduct(String productName, String materialName, int materialAmount, long materialPrice) throws SQLException {
+        // Добавляем материал
+        addStockMaterial(materialName, materialAmount, materialPrice);
+        int materialId = getMaterialId(materialName);
+        // Добавляем продукт
+        int productId = getProductId(productName);
+        if(0 == productId) {
+            String sql = "insert into products(name) values(?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, productName);
+            statement.executeUpdate();
+            productId = getProductId(productName);
+            sql = "insert into relation values(?, ?, ?)";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, productId);
+            statement.setInt(2, materialId);
+            statement.setInt(3, materialAmount);
+            statement.executeUpdate();
+        } else {
+            // редактируем зависимость
+            String sql = "select * from relation where pid = ? and mid = ?";
+            PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            statement.setInt(1, productId);
+            statement.setInt(2, materialId);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) sql = "update relation set amount = ? where pid = ? and mid = ?";
+            else sql = "insert into relation(amount, pid, mid) values(?, ?, ?)";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, materialAmount);
+            statement.setInt(2, productId);
+            statement.setInt(3, materialId);
+            statement.executeUpdate();
+        }
+    }
 }

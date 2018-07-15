@@ -66,8 +66,8 @@ public class Main {
             }
             if(command.equalsIgnoreCase("stat")) { printStatistics(); continue; }
             if(command.equalsIgnoreCase("materials")) { printStockMaterials(); continue; }
-            if(command.equalsIgnoreCase("madd")) continue;
-            if(command.equalsIgnoreCase("padd")) continue;
+            if(command.equalsIgnoreCase("madd")) { addStockMaterial(scanner); continue; }
+            if(command.equalsIgnoreCase("padd")) { addStockProduct(scanner); continue; }
             if(command.equalsIgnoreCase("exit")) break;
             if(!command.isEmpty()) System.out.printf("Неизвестная команда '%s'!\n", command);
         }
@@ -81,6 +81,108 @@ public class Main {
             LOG.error(e.getMessage());
         } catch (IOException e) {/**/}
         LOG.info("Сервер фирмы завершил работу!");
+    }
+
+
+    /**
+     * Просим ввести новый продукт
+     * @param scanner - сканер входного потока
+     */
+    private static void addStockProduct(Scanner scanner) {
+        while(true) {
+            String inline = "";
+            System.out.print("Введите продукт или Enter для отмены (пример: продукт/материал1/количество/цена/материал2/количество/цена) >>> ");
+            if (scanner.hasNextLine()) inline = scanner.nextLine();
+            if((inline = inline.trim()).equals("")) break;  // Введен Enter
+            String[] material = inline.split("\\s*/\\s*");
+            if(1 != material.length % 3) {
+                System.out.println("Вы указали не полную информацию!");
+                continue;  // Не вся информация введена
+            }
+            if (!material[0].matches("^[A-Za-zА-Яа-я]+[A-Za-zА-Яа-я -_]*[A-Za-zА-Яа-я]+$")) {
+                System.out.println("Наименование продукта содержит недопустимые символы!");
+                continue;    // Недопустимое название
+            }
+            boolean success = true;
+            for (int i = 0; i < material.length / 3; i++) {
+                if (!material[i * 3 + 1].matches("^[A-Za-zА-Яа-я]+[A-Za-zА-Яа-я -_]*[A-Za-zА-Яа-я]+$")) {
+                    System.out.println("Наименование материала содержит недопустимые символы!");
+                    success = false;    // Недопустимое название
+                    break;
+                }
+                if(!material[i * 3 + 2].matches("^\\d+$")) {
+                    System.out.println("Количество материала содержит недопустимые символы!");
+                    success = false;    // Недопустимое количество
+                    break;
+                }
+                if(!material[i * 3 + 3].matches("^\\d+([.,]\\d+)?$")) {
+                    System.out.println("Цена материала содержит недопустимые символы!");
+                    success = false;    // Недопустимая цена
+                    break;
+                }
+            }
+            if(!success) continue;  // Есть ошибки в введенной информации
+            String productName = material[0].substring(0,1).toUpperCase() + material[0].substring(1);
+            String materialName;
+            int materialAmount;
+            long materialPrice;
+            for (int i = 0; i < material.length / 3; i++) {
+                materialName = material[i * 3 + 1].substring(0,1).toUpperCase() + material[i * 3 + 1].substring(1);
+                materialAmount = Integer.parseInt(material[i * 3 + 2]);
+                materialPrice = Math.round(Double.parseDouble(material[i * 3 + 3].replaceAll(",", ".")) * 100);
+                try {
+                    firm.addStockProduct(productName, materialName, materialAmount, materialPrice);
+                } catch (SQLException e) {
+                    LOG.error(e.getMessage());
+                }
+            }
+            LOG.info(String.format("Добавлен продукт '%s'.\n", productName));
+            break;
+        }
+    }
+
+
+    /**
+     * Просим ввести новый материал
+     * @param scanner - сканер входного потока
+     */
+    private static void addStockMaterial(Scanner scanner) {
+        String materialName;
+        int materialAmount;
+        long materialPrice;
+        while(true) {
+            String inline = "";
+            System.out.print("Введите материал или Enter для отмены (пример: наименование/количество/цена) >>> ");
+            if (scanner.hasNextLine()) inline = scanner.nextLine();
+            if((inline = inline.trim()).equals("")) break;  // Введен Enter
+            String[] material = inline.split("\\s*/\\s*");
+            if(3 > material.length) {
+                System.out.println("Вы указали не полную информацию!");
+                continue;  // Не вся информация введена
+            }
+            if (!material[0].matches("^[A-Za-zА-Яа-я]+[A-Za-zА-Яа-я -_]*[A-Za-zА-Яа-я]+$")) {
+                System.out.println("Наименование содержит недопустимые символы!");
+                continue;    // Недопустимое название
+            }
+            if(!material[1].matches("^\\d+$")) {
+                System.out.println("Количество содержит недопустимые символы!");
+                continue;    // Недопустимое количество
+            }
+            if(!material[2].matches("^\\d+([.,]\\d+)?$")) {
+                System.out.println("Цена содержит недопустимые символы!");
+                continue;    // Недопустимая цена
+            }
+            materialName = material[0].substring(0,1).toUpperCase() + material[0].substring(1);
+            materialAmount = Integer.parseInt(material[1]);
+            materialPrice = Math.round(Double.parseDouble(material[2].replaceAll(",", ".")) * 100);
+            try {
+                firm.addStockMaterial(materialName, materialAmount, materialPrice);
+            } catch (SQLException e) {
+                LOG.error(e.getMessage());
+            }
+            LOG.info(String.format("Добавлен материал '%s' в количестве %d, стоимостью %.2f\n", materialName, materialAmount, (double) materialPrice / 100));
+            break;
+        }
     }
 
 

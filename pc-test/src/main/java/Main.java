@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -270,7 +269,7 @@ public class Main {
             if(scanner.hasNextLine()) {
                 stringMoney = scanner.nextLine();
                 stringMoney = stringMoney.trim();
-                if(stringMoney.matches("^[1-9][0-9]*((\\.|,)[0-9]+)?$")) {
+                if(stringMoney.matches("^[1-9][0-9]*(([.,])[0-9]+)?$")) {
                     // Если значение введено правильно
                     customerMoney = Math.round(Double.parseDouble(stringMoney.replaceAll(",", ".")) * 100);
                     break;
