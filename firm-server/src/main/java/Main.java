@@ -29,7 +29,7 @@ public class Main {
             if(scanner.hasNextLine()) {
                 stringMoney = scanner.nextLine();
                 stringMoney = stringMoney.trim();
-                if(stringMoney.matches("^[1-9][0-9]*((\\.|,)[0-9]+)?$")) {
+                if(stringMoney.matches("^[1-9][0-9]*(([.,])[0-9]+)?$")) {
                     // Если значение введено правильно
                     money = Math.round(Double.parseDouble(stringMoney.replaceAll(",", ".")) * 100);
                     break;
