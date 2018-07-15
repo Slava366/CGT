@@ -10,7 +10,7 @@ public class Response implements Serializable {
 
     private boolean success;        // Статус
 
-    private String message;         // Сообщение
+    private long money;         // Сообщение
 
 
     /**
@@ -31,11 +31,11 @@ public class Response implements Serializable {
         this.success = success;
     }
 
-    public String getMessage() {
-        return message;
+    public long getMoney() {
+        return money;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMoney(long money) {
+        this.money = money;
     }
 }

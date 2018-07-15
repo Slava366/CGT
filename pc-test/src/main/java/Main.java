@@ -1,6 +1,12 @@
+import firm.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +24,15 @@ public class Main {
         // Создаем сканер для прослушивания входного потока
         Scanner scanner = new Scanner(System.in);
         // Запрашиваем количество одновременно работающих заказчиков
-        int customerAmount = 20;//getCustomerAmount(scanner);
+        int customerAmount = getCustomerAmount(scanner);
         // Запрашиваем количество максимально допустимых отказов заказчику
-        int maxFailure = 5;//getCustomerMaxFailure(scanner);
+        int maxFailure = getCustomerMaxFailure(scanner);
         // Запрашиваем размер начального капитала заказчика
-        long customerMoney = 200000;//getCustomerMoney(scanner);
+        long customerMoney = getCustomerMoney(scanner);
         // Запрашиваем количество одновременно работающих поставщиков
-        int providerAmount = 1;//getProviderAmount(scanner);
+        int providerAmount = getProviderAmount(scanner);
         // Запрашиваем интервал между обращениями поставщика к серверу фирмы
-        int providerInterval = 1000;//getProviderInterval(scanner);
+        int providerInterval = getProviderInterval(scanner);
 
         // Устанавливаем соединение с БД
         try {
@@ -89,10 +95,32 @@ public class Main {
             // Выводим остатки материалов на складе
             printStockMaterials();
             System.out.println();
+            // Остаток на счету фирмы
+            printFirmMoney();
+            System.out.println();
             // Закрываем соединение с БД
             if(!connection.isClosed()) connection.close();
             LOG.info("Соединение с БД закрыто!");
         } catch (SQLException e) {
+            LOG.error(e.getMessage());
+        }
+    }
+
+
+    /**
+     * Выводит остаток на счету фирмы
+     */
+    private static void printFirmMoney() {
+        try(Socket client = new Socket("localhost", 8080);
+            ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(client.getInputStream())) {
+            oos.writeObject(new Response(true));
+            oos.flush();
+            Object response = ois.readObject();
+            if(response instanceof Response) {
+                System.out.printf("Остаток на счету фирмы: %.2f руб.\n", (double) ((Response) response).getMoney() / 100);
+            } else LOG.error("Неизвестный ответ сервера!");
+        } catch (IOException | ClassNotFoundException e) {
             LOG.error(e.getMessage());
         }
     }

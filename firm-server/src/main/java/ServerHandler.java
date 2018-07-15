@@ -94,6 +94,13 @@ public class ServerHandler implements Runnable {
                     oos.writeObject(response);
                     oos.flush();
                 }
+                if (requestObject instanceof Response) {
+                    // Отправляем остаток средств
+                    Response responseMoney = new Response(true);
+                    responseMoney.setMoney(firm.getMoney());
+                    oos.writeObject(responseMoney);
+                    oos.flush();
+                }
             } catch (IOException | ClassNotFoundException | SQLException e) {
                 LOG.error(e.getMessage());
             }
