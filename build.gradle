@@ -49,6 +49,11 @@ project(':firm-server') {
         compile project(':common')
     }
 
+    jar {
+        baseName = 'server'
+        version = '1.0'
+    }
+
     task myOneJar(type: OneJar) {
         mainClass = 'Main'
     }
@@ -59,6 +64,11 @@ project('pc-test') {
 
     dependencies {
         compile project(':common')
+    }
+
+    jar {
+        baseName = 'server'
+        version = '1.0'
     }
 
     task myOneJar(type: OneJar) {

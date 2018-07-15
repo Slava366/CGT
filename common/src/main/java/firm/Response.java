@@ -10,7 +10,7 @@ public class Response implements Serializable {
 
     private boolean success;        // Статус
 
-    private long money;         // Сообщение
+    private long money;
 
 
     /**

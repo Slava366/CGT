@@ -41,7 +41,7 @@ public class ServerHandler implements Runnable {
     @Override
     public void run() {
         synchronized (lock) {
-            // Инициализтруем каналы общения
+            // Инициализируем каналы общения
             try (ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
                  ObjectInputStream ois = new ObjectInputStream(client.getInputStream())) {
                 // Получаем запрос клиента
