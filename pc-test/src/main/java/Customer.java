@@ -28,6 +28,8 @@ public class Customer extends Thread {
 
     private  AtomicInteger failure = new AtomicInteger(0);  // Отказы
 
+    private int trying = 0;                     // Попытки заказать продукт
+
 
     /**
      * Конструктор
@@ -35,7 +37,7 @@ public class Customer extends Thread {
      * @param maxFailure - максимальное количество отказов
      */
     public Customer(long money, int maxFailure, Connection connection) {
-        bill.setMoney(money * 100);
+        bill.setMoney(money);
         this.maxFailure = maxFailure;
         this.connection = connection;
     }
@@ -59,6 +61,11 @@ public class Customer extends Thread {
             } catch (SQLException e) {
                 LOG.error(e.getMessage());
                 break;
+            }
+            // Выходим если не хватает денег
+            if(productRequest.getPrice() * productRequest.getAmount() > bill.getMoney()) {
+                if (10 < ++trying) continue;    // Пробуем заказать продукт, на который хватит денег
+                break;  // Выходим
             }
             // Соединяемся с сервером фирмы и создаем потоки ввода/вывода
             try(Socket client = new Socket("localhost", 8080);
