@@ -67,7 +67,7 @@ project('pc-test') {
     }
 
     jar {
-        baseName = 'server'
+        baseName = 'test'
         version = '1.0'
     }
 
