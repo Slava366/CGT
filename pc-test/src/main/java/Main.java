@@ -103,6 +103,7 @@ public class Main {
         } catch (SQLException e) {
             LOG.error(e.getMessage());
         }
+        scanner.nextLine();
     }
 
 
